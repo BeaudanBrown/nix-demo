@@ -3,6 +3,7 @@
   # General tools
   pkgs.bashInteractive
   pkgs.coreutils
+  pkgs.nix
   # Genomics tools
   pkgs.plink-ng
   pkgs.bcftools

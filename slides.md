@@ -222,23 +222,30 @@ cowsay "Oh no!" || true
 ```
 <!-- reset_layout -->
 <!-- pause -->
-# For referrence...
+## For referrence...
 ![image:width:100%](images/gdal1.png)
 <!-- end_slide -->
 <!-- alignment: center -->
-# Real world example
+# Nix everything
+## Real world example
 ```bash +exec +acquire_terminal
 # Complex packages
 /// nvim nix/moonlight.nix
 ```
 <!-- pause -->
-<!-- jump_to_middle -->
-# Infrastructure
+<!-- new_lines: 2 -->
+## Infrastructure
 ```bash +exec +acquire_terminal
-# Complex packages
-
+# Anything as code
 /// nvim '+/nginxVhosts' ~/documents/nix-dotfiles/modules/hosted-services/server.nix
 /// nvim '+/hostedServices' ~/documents/nix-dotfiles/modules/services/attic/nas.nix
+```
+<!-- pause -->
+<!-- new_lines: 2 -->
+## Even Docker
+```bash +exec +acquire_terminal
+# Better than Docker
+/// nvim '+normal! GVggj' nix/docker-image.nix
 ```
 <!-- end_slide -->
 <!-- jump_to_middle -->
