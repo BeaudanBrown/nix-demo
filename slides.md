@@ -320,8 +320,8 @@ cowsay "Oh no!" || true
 ## Infrastructure
 ```bash +exec +acquire_terminal
 # Anything as code
-/// nvim '+/nginxVhosts' ~/documents/nix-dotfiles/modules/hosted-services/server.nix
-/// nvim '+/hostedServices' ~/documents/nix-dotfiles/modules/services/attic/nas.nix
+/// nvim '+/nginxVhosts' vendored/nix-dotfiles/modules/hosted-services/server.nix
+/// nvim '+/hostedServices' vendored/nix-dotfiles/modules/services/attic/nas.nix
 ```
 <!-- pause -->
 <!-- new_lines: 2 -->
