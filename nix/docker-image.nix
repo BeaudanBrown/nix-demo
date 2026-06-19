@@ -5,6 +5,11 @@ pkgs.dockerTools.buildLayeredImage {
 
   contents = demoPackages ++ [ demoCheck ];
 
+  extraCommands = ''
+    mkdir -p tmp work
+    chmod 1777 tmp
+  '';
+
   config = {
     Cmd = [ "/bin/bash" ];
     WorkingDir = "/work";
