@@ -74,7 +74,7 @@
             "''${podman_ephemeral[@]}" load --quiet --input ${self.packages.${system}.dockerImage}
 
             echo "Running demo-check in nix-demo:latest..."
-            "''${podman_ephemeral[@]}" run --rm nix-demo:latest demo-check
+            "''${podman_ephemeral[@]}" run --rm nix-demo:latest -it
           '';
         };
       in
