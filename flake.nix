@@ -5,22 +5,25 @@
   };
 
   outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+    let
+      demoVm = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [ ./nixos/demo-vm/configuration.nix ];
+      };
+    in
+    {
+      nixosConfigurations.demo = demoVm;
+    }
+    // flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ (import ./nix/overlay-clipr.nix) ];
         };
 
-        customPraise = import ./nix/custom-praise.nix { inherit pkgs; };
-
         rEnv = import ./nix/r-env.nix {
           inherit pkgs;
         };
-
-        # rEnv = import ./nix/r-env.nix {
-        #   inherit pkgs customPraise;
-        # };
 
         pythonEnv = import ./nix/python-env.nix { inherit pkgs; };
 
@@ -85,21 +88,31 @@
           ];
         };
 
-        apps.demo-check = {
-          type = "app";
-          program = "${demoCheck}/bin/demo-check";
+        apps = {
+          demo-check = {
+            type = "app";
+            program = "${demoCheck}/bin/demo-check";
+          };
+
+          run-container = {
+            type = "app";
+            program = "${runContainer}/bin/run-container";
+          };
+        } // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
+          demo-vm = {
+            type = "app";
+            program = "${demoVm.config.system.build.vm}/bin/run-demo-vm";
+          };
         };
 
-        apps.run-container = {
-          type = "app";
-          program = "${runContainer}/bin/run-container";
-        };
-
-        packages.demo-check = demoCheck;
-        packages.run-container = runContainer;
-
-        packages.dockerImage = import ./nix/docker-image.nix {
-          inherit pkgs demoPackages demoCheck;
+        packages = {
+          demo-check = demoCheck;
+          run-container = runContainer;
+          dockerImage = import ./nix/docker-image.nix {
+            inherit pkgs demoPackages demoCheck;
+          };
+        } // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
+          demo-vm = demoVm.config.system.build.vm;
         };
       });
 }

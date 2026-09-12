@@ -9,3 +9,7 @@ result
 
 # pre-commit
 .pre-commit-config.yaml
+.pi/
+.envrc
+*.qcow2
+notes

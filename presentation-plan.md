@@ -28,7 +28,6 @@ Current relevant files:
 
 - `flake.nix` — small top-level composition file;
 - `nix/overlay-clipr.nix` — overlay/version-bump demo;
-- `nix/custom-praise.nix` — custom R package build demo;
 - `nix/r-env.nix` — R environment;
 - `nix/python-env.nix` — Python environment;
 - `nix/demo-packages.nix` — shared dev shell/container package list;
@@ -54,7 +53,6 @@ Includes R plus packages such as:
 - `readr`
 - `reticulate`
 - `terra`
-- custom CRAN package `praise`, built directly with `buildRPackage`
 - overlaid CRAN package `clipr`, bumped in `nix/overlay-clipr.nix`
 
 ### Python
@@ -152,7 +150,7 @@ Open the file and point out that the top-level flake mostly composes small demo 
 - `nix/python-env.nix` — Python environment, including `geopandas`;
 - `nix/demo-packages.nix` — genomics/geospatial/system tools;
 - `nix/docker-image.nix` — container image generation;
-- `nix/overlay-clipr.nix` and `nix/custom-praise.nix` — package extension examples.
+- `nix/overlay-clipr.nix` — package override example.
 
 Do not explain every line. The audience just needs to see that the environment is declared in small, composable pieces.
 
@@ -160,30 +158,9 @@ Suggested line:
 
 > “This is the whole point: R packages, Python packages, geospatial libraries, and genomics binaries are specified together.”
 
-### 4. Show custom packaging and an overlay
+### 4. Override an existing package with an overlay
 
-Goal: show two different ways the project can go beyond exactly what is in the pinned `nixpkgs` package set.
-
-#### A. Build a custom R package directly
-
-Point out `nix/custom-praise.nix`:
-
-```nix
-customPraise = pkgs.rPackages.buildRPackage rec {
-  pname = "praise";
-  version = "1.0.0";
-  src = pkgs.fetchurl {
-    url = "https://cran.r-project.org/src/contrib/${pname}_${version}.tar.gz";
-    hash = "...";
-  };
-};
-```
-
-Narrative:
-
-> “This is the pattern for a package that is not in Nixpkgs yet, or for a project-local package/patched version that I want to add to this environment.”
-
-#### B. Override an existing package with an overlay
+Goal: show how the project can go beyond exactly what is in the pinned `nixpkgs` package set.
 
 Point out `nix/overlay-clipr.nix`:
 
@@ -532,7 +509,6 @@ Potential line:
 - Generate and commit `flake.lock` before the presentation.
 - Pre-run the demo on local, WSL, and HPC.
 - Confirm whether the PLINK executable is `plink2` or `plink` on each platform.
-- Test the direct `customPraise` R package build in `nix/custom-praise.nix`.
 - Test the `clipr` version bump in `nix/overlay-clipr.nix`.
 - Test `dockerTools.buildLayeredImage` as `.#dockerImage`.
 - Add and test a cross-compiled binary demo plus binfmt/QEMU execution.
