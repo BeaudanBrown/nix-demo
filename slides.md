@@ -1,74 +1,44 @@
 <!-- alignment: center -->
 <!-- jump_to_middle -->
 
-# Nix for reproducible research
+# Nix in a Nutshell
 ## Beaudan Campbell-Brown
 
 <!-- end_slide -->
 <!-- alignment: center -->
 # Plan
 
-<!-- column_layout: [1, 1] -->
+| Overview | | Suggestions | |
+|---|---|---|---|
+| Why Nix | <span style="color: #94e2d5">should make your life easier</span> | Ask questions | <span style="color: #94e2d5">what do you want to know</span> |
+| How does it work (briefly) | <span style="color: #94e2d5">rabbit hole</span> | Slow me down | <span style="color: #94e2d5">confused or interested</span> |
+| How you use it | <span style="color: #94e2d5">language, tool, ecosystem</span> | Anything is possible | <span style="color: #94e2d5">yes it can do that¹</span> |
+| How I am using it | <span style="color: #94e2d5">everything</span> | Live is impressive | <span style="color: #94e2d5">if I can show it I will</span> |
 
-<!-- column: 0 -->
-
-
-## Overview
-
-- Why Nix
-    - should make your life easier
-- How does it work (briefly)
-    - tip of the iceberg
-- How you use it
-    - language, tool, ecosystem
-- How I am using it
-    - everything
-
-<!-- column: 1 -->
-## Suggestions
-
-- Ask questions
-    - what do you want to know
-- Slow me down
-    - tell me your interests
-- Anything is possible
-    - yes it can do that¹
-- Live is impressive
-    - if I can show it I will
-
-<!-- reset_layout -->
 <!-- pause -->
+<!-- jump_to_middle -->
 # Why Nix
 
-<!-- column_layout: [1, 1] -->
+<!--
+speaker_note: |
+  Use Jenga versus Lego as the intuition.
 
-<!-- column: 0 -->
+  Traditional systems feel like Jenga: installations and upgrades alter one
+  shared stack, so changing or removing one piece can destabilise something
+  else. You often have to remember how the tower was assembled.
 
-## Traditional
+  Nix is closer to Lego: components have explicit connections, versions can
+  coexist, and a project describes how its pieces fit together. It does not
+  remove complexity; it makes the connections visible and reproducible.
+-->
 
-- Running software should be easy
-    - laziness, impatience, and hubris
-- Docker feels wrong
-    - a VM for my database?
-- Why am I following a README
-    - it's just a script that doesn't work
-- Too many tools
-    - I don't care how it's done
+| Traditional | | Nix | |
+|---|---|---|---|
+| Should be easy | <span style="color: #94e2d5">laziness, impatience, hubris</span> | Everything is code  | <span style="color: #94e2d5">debuggable & correct</span> |
+| Docker often feels wrong | <span style="color: #94e2d5">bundle a whole OS?</span> | Changes can be fearless | <span style="color: #94e2d5">git is your backups</span> |
+| Why am I following a README | <span style="color: #94e2d5">a script that doesn't work</span> | Someone already did it | <span style="color: #94e2d5">it works on OUR machine</span> |
+| Too many tools | <span style="color: #94e2d5">I don't care how it's done</span> | Everything is composable | <span style="color: #94e2d5">software feels like lego</span> |
 
-<!-- column: 1 -->
-
-## Nix
-
-- Everything is code, code is debuggable
-    - can be correct
-- Changes can be fearless
-    - git is your backups
-- Someone already did it
-    - it works on OUR machine
-- Everything is composable
-    - everything is a function
-
-<!-- reset_layout -->
 <!-- pause -->
 
 <!-- end_slide -->
@@ -78,91 +48,36 @@
 
 **Nix is a tool for configuring, building and deploying software reproducibly.**
 
-<!-- column_layout: [1, 1] -->
+| Traditional | | Nix | |
+|---|---|---|---|
+| Imperative | <span style="color: #f38ba8">step 1, step 2</span> | Declarative | <span style="color: #94e2d5">describe the state you want</span> |
+| Stateful | <span style="color: #f38ba8">success depends on ambient environment</span> | Hermetic | <span style="color: #94e2d5">success is transferable</span> |
+| Fragmented | <span style="color: #f38ba8">what does "install" do?</span> | Centralised | <span style="color: #94e2d5">everything in the /nix/store</span> |
+| Transient | <span style="color: #f38ba8">contingent, works while it's there</span> | Ephemeral | <span style="color: #94e2d5">leaves no trace</span> |
 
-<!-- column: 0 -->
+<!-- alignment: center -->
 
-## Traditional
-
-- Imperative
-    - <span style="color: #f38ba8">step 1, step 2</span>
-- Stateful
-    - <span style="color: #f38ba8">success depends on ambient environment</span>
-- Fragmented
-    - <span style="color: #f38ba8">what does "install" do?</span>
-- Transient
-    - <span style="color: #f38ba8">it works while it's there</span>
-
-<!-- column: 1 -->
-
-## Nix
-
-- Declarative
-    - <span style="color: #94e2d5">describe the state you want</span>
-- Hermetic
-    - <span style="color: #94e2d5">success is transferable</span>
-- Centralised
-    - <span style="color: #94e2d5">everything in the /nix/store</span>
-- Ephemeral
-    - <span style="color: #94e2d5">leaves no trace</span>
-
-<!-- reset_layout -->
 <!-- pause -->
 # What is software
 
-<!-- column_layout: [1, 1] -->
+| Software | | Also software | |
+|---|---|---|---|
+| Compiled binaries | <span style="color: #94e2d5">browser, git, ffmpeg</span> | Development environments | <span style="color: #94e2d5">postgres, R, toolchain</span> |
+| Scripts | <span style="color: #94e2d5">bash, python</span> | Analysis pipelines | <span style="color: #94e2d5">load → clean → process</span> |
+| Full stack applications | <span style="color: #94e2d5">multi-process, database, daemons</span> | Containers | <span style="color: #94e2d5">docker, SIF</span> |
+| System libraries | <span style="color: #94e2d5">glibc, openssl, cuda</span> | Linux systems | <span style="color: #94e2d5">ansible, puppet, NixOS</span> |
 
-<!-- column: 0 -->
+<!-- alignment: center -->
 
-## Software
-
-- Compiled binaries
-    - <span style="color: #94e2d5">browser, git, ffmpeg</span>
-- Scripts
-    - <span style="color: #94e2d5">bash, python</span>
-- Full stack applications
-    - <span style="color: #94e2d5">multi-process, database, daemons</span>
-- System libraries
-    - <span style="color: #94e2d5">glibc, openssl, cuda</span>
-
-<!-- column: 1 -->
-
-## Also software
-
-- Development environments
-    - <span style="color: #94e2d5">postgres, R, dependencies</span>
-- Analysis pipelines
-    - <span style="color: #94e2d5">load -> clean -> process -> output</span>
-- Containers
-    - <span style="color: #94e2d5">docker, SIF</span>
-- Linux systems
-    - <span style="color: #94e2d5">ansible, puppet, NixOS</span>
 <!-- pause -->
 <!-- reset_layout -->
 # How is software ran
-<!-- column_layout: [1, 1] -->
 
-<!-- column: 0 -->
-
-## Traditional
-
-- Name referenced
-    - <span style="color: #f38ba8">vague, best effort, fallible</span>
-- Mutable
-    - <span style="color: #f38ba8">updating, uninstalling, moving</span>
-- Convention
-    - <span style="color: #f38ba8">/usr/lib, /opt, /bin</span>
-
-<!-- column: 1 -->
-
-## Nix
-
-- Hash referenced
-    - <span style="color: #94e2d5">deterministic, guaranteed, unique</span>
-- Immutable
-    - <span style="color: #94e2d5">read only, version locked, isolated</span>
-- Explicit
-    - <span style="color: #94e2d5">nix store only, fail at eval time</span>
+| Traditional | | Nix | |
+|---|---|---|---|
+| Name referenced | <span style="color: #f38ba8">vague, best effort, fallible</span> | Hash referenced | <span style="color: #94e2d5">deterministic, guaranteed, unique</span> |
+| Mutable | <span style="color: #f38ba8">updating, uninstalling, moving</span> | Immutable | <span style="color: #94e2d5">read only, version locked, isolated</span> |
+| Convention | <span style="color: #f38ba8">/usr/lib, /opt, /bin</span> | Explicit | <span style="color: #94e2d5">nix store only, fail at eval time</span> |
 
 <!-- end_slide -->
 <!-- alignment: center -->
@@ -188,8 +103,6 @@ Think compiler bootstrapping, Nix assembly
 - Hashed
 <!-- pause -->
 <!-- reset_layout -->
-<!-- column_layout: [1, 8, 1] -->
-<!-- column: 1 -->
 ## Downstream consumes from store
 ```bash +exec
 # My /nix/store
@@ -197,7 +110,6 @@ Think compiler bootstrapping, Nix assembly
 /// printf 'Nix store directories: %s\n\n' "$(printf '%s\n' "$dirs" | wc -l)"
 /// printf '%s\n' "$dirs" | shuf -n 5
 ```
-<!-- reset_layout -->
 <!-- end_slide -->
 <!-- alignment: center -->
 
@@ -227,9 +139,9 @@ Think compiler bootstrapping, Nix assembly
 
 <!-- column: 1 -->
 ## Package manager
+- nix develop
 - nix build
 - nix run
-- nix develop
 ```bash +exec
 nix run nixpkgs#cowsay "Wow!"
 cowsay "Oh no!" || true
@@ -274,7 +186,6 @@ cowsay "Oh no!" || true
 - pixi
 - pip-tools
 - pipx
-- pyenv
 - ...
 <!-- reset_layout -->
 <!-- pause -->
