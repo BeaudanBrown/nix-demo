@@ -4,7 +4,7 @@ let
   demoWeb = import ../../nix/demo-web.nix { inherit pkgs; };
 in
 {
-  # imports = [ ./monitoring.nix ];
+  imports = [ ./monitoring.nix ];
 
   networking = {
     hostName = "demo";

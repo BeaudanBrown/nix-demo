@@ -174,6 +174,23 @@ Think compiler bootstrapping, Nix assembly
 /// printf '%s\n' "$dirs" | shuf -n 5
 ```
 <!-- end_slide -->
+<!--
+speaker_note: |
+  - Monorepo
+  - >140,000 packages
+  - >1,000,000 commits
+  - >10,000 contributors
+  - Cross platform
+  - Cross architecture
+  - Rolling and stable
+
+  - Someone else has built it you don't need to
+  - Default binary cache, hundreds of TB and billions of requrests/month
+  - Hydra is NixOS's continuous-build system; cache.nixos.org serves its outputs
+  - Organisations can run their own binary cache for internal tooling, share builds, enterprise SBOM, CI
+
+  - Next: How do we use it
+-->
 <!-- alignment: center -->
 
 # In practice
@@ -192,18 +209,11 @@ Think compiler bootstrapping, Nix assembly
 
 | Part | Purpose |
 |---|---|
-| Cache | <span style="color: #94e2d5">Downloads signed store paths from remote storage</span> |
+| Cache | <span style="color: #94e2d5">Download store paths from remote storage</span> |
 | `cache.nixos.org` | <span style="color: #94e2d5">&gt;700 TiB; around 6 billion requests each month</span> |
 | Hydra | <span style="color: #94e2d5">Builds Nixpkgs continuously and publishes outputs</span> |
-| Your cache | <span style="color: #94e2d5">Publish private packages and CI build outputs</span> |
+| Your cache | <span style="color: #94e2d5">Internal tooling, share builds, enterprise SBOM</span> |
 
-<!--
-speaker_note: |
-  - Hydra is NixOS's continuous-build system; cache.nixos.org serves its outputs
-  - A cache is not a remote filesystem mount: clients fetch signed Nix store paths
-  - The public cache avoids rebuilding most common dependencies locally
-  - Organisations can run their own binary cache for private packages and CI outputs
--->
 <!-- end_slide -->
 <!-- alignment: center -->
 # nix run
@@ -213,7 +223,7 @@ speaker_note: |
 speaker_note: |
   - Run a program without adding it to your normal PATH or global profile
   - Evaluate: dependency closure
-  - Dependencies follow the same process; building an app need not mean building its compiler
+  - store -> cache -> build -> run
   - Downloads and build outputs remain in /nix/store for reuse
   - nix run uses the host environment; it is not a container or runtime sandbox
   - This nixpkgs reference uses the registry; the project demos will use locked flake inputs
@@ -254,8 +264,8 @@ speaker_note: |
 | Ingredient | What Nix does |
 |---|---|
 | Source | <span style="color: #94e2d5">Takes a snapshot of the application</span> |
-| Build instructions | <span style="color: #94e2d5">Produces the package and its launcher</span> |
 | Dependencies | <span style="color: #94e2d5">Connects the launcher to the required Python</span> |
+| Build instructions | <span style="color: #94e2d5">Produces the package and its launcher</span> |
 | Output | <span style="color: #94e2d5">Stores the result immutably in /nix/store</span> |
 
 <!-- jump_to_middle -->
