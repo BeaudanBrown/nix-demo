@@ -81,24 +81,29 @@ speaker_note: |
 
 <!--
 speaker_note: |
+  - Nix is a tool for configuring, building and deploying software reproducibly.
+  - tool, language, core insight is inside
+  - Explain Nix by comparing to traditional software builds
   - Imperative → Declarative
-    - Declare inputs and desired outputs
-    - Compiler commands and Makefiles remain imperative
-    - Nix encapsulates them as “pure” functional steps
+    - Install dependencies... configure environment, difficult to undo or replicate
+    - Nix encapsulates imperative parts as “pure” functional steps
+    - Declare the state you want, abstract the process
   - Stateful → Hermetic
+    - trad: state depends on env, nix: success transferable
     - Explicit dependencies instead of ambient machine state
     - Sandboxing enforces the build boundary
   - Fragmented → Centralised
-    - Explicit paths in `/nix/store`
+    - trad: Effects unclear, nix: populate store
     - Multiple versions coexist
-    - Profiles—and many NixOS system paths—use symlinks to expose store content
-    - Remove the target and the link no longer works; application data outside the store remains
+    - symlinks to expose store content
+    - application data outside the store
   - Transient → Ephemeral
     - Returning to a project feels risky: the environment has drifted
     - Temporary shell, durable environment definition
     - Recreate the environment instead of preserving a fragile installation
     - Impermanence: reset an ephemeral root at boot; explicitly choose which state persists
     - Undeclared changes on the ephemeral filesystem disappear—not a full system rebuild each boot
+    - Next: Why I love Nix
 -->
 
 **Nix is a tool for configuring, building and deploying software reproducibly.**
@@ -113,7 +118,7 @@ speaker_note: |
 <!-- end_slide -->
 <!-- alignment: center -->
 <!-- jump_to_middle -->
-# Why Nix
+# Why I love Nix
 
 <!--
 speaker_note: |
@@ -122,6 +127,7 @@ speaker_note: |
     - Express setup as code we can inspect and debug
   - Docker often feels wrong → Changes can be fearless
     - Do I need a container for every tool?
+    - Doesn't feel "native"
     - Track configuration in Git; inspect and revert changes
     - Configuration history isn’t a backup of application data
   - Why am I following a README → Someone already did it
@@ -129,8 +135,10 @@ speaker_note: |
     - Reuse a working package definition instead of repeating the setup
   - Too many tools → Everything is composable
     - Different tools for packages, environments, containers, and systems
+    - Often I don't care
     - Nix provides a shared model for composing these
     - Jenga versus Lego: changing a shared stack versus connecting explicit pieces
+  - Next: How does nix do this
 -->
 
 | Traditional | | Nix | |
