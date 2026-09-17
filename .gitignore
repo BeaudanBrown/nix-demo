@@ -3,6 +3,7 @@
 devenv.local.nix
 devenv.local.yaml
 result
+/output/
 
 # direnv
 .direnv
@@ -10,6 +11,9 @@ result
 # pre-commit
 .pre-commit-config.yaml
 .pi/
-.envrc
 *.qcow2
 notes
+
+# Python demo
+__pycache__/
+.ruff_cache/

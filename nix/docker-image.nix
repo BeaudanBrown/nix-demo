@@ -1,9 +1,9 @@
-{ pkgs, demoPackages, demoCheck }:
+{ pkgs, demoWeb }:
 pkgs.dockerTools.buildLayeredImage {
   name = "nix-demo";
   tag = "latest";
 
-  contents = demoPackages ++ [ demoCheck ];
+  contents = [ demoWeb ];
 
   extraCommands = ''
     mkdir -p tmp work
@@ -11,7 +11,8 @@ pkgs.dockerTools.buildLayeredImage {
   '';
 
   config = {
-    Cmd = [ "/bin/bash" ];
+    Cmd = [ "${demoWeb}/bin/demo-web" ];
     WorkingDir = "/work";
+    ExposedPorts."8000/tcp" = { };
   };
 }

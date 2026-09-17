@@ -31,6 +31,8 @@
           inherit pkgs rEnv pythonEnv;
         };
 
+        demoWeb = import ./nix/demo-web.nix { inherit pkgs; };
+
         demoCheck = pkgs.writeShellApplication {
           name = "demo-check";
           runtimeInputs = demoPackages;
@@ -76,16 +78,27 @@
             echo "Loading nix-demo:latest into ephemeral Podman storage..."
             "''${podman_ephemeral[@]}" load --quiet --input ${self.packages.${system}.dockerImage}
 
-            echo "Running demo-check in nix-demo:latest..."
-            "''${podman_ephemeral[@]}" run --rm nix-demo:latest -it
+            echo "Serving demo-web at http://grill:8001 (Ctrl+C to stop)..."
+            "''${podman_ephemeral[@]}" run --rm -it -p 8001:8000 nix-demo:latest
           '';
         };
       in
       {
-        devShells.default = pkgs.mkShell {
-          packages = demoPackages ++ [
-            pkgs.presenterm
-          ];
+        devShells = {
+          default = import ./nix/dev-shell.nix { inherit pkgs; };
+
+          presentation = pkgs.mkShell {
+            packages = with pkgs; [
+              presenterm
+              just
+              fd
+              bashInteractive
+            ];
+          };
+
+          research = pkgs.mkShell {
+            packages = demoPackages;
+          };
         };
 
         apps = {
@@ -106,10 +119,11 @@
         };
 
         packages = {
+          demo-web = demoWeb;
           demo-check = demoCheck;
           run-container = runContainer;
           dockerImage = import ./nix/docker-image.nix {
-            inherit pkgs demoPackages demoCheck;
+            inherit pkgs demoWeb;
           };
         } // pkgs.lib.optionalAttrs (system == "x86_64-linux") {
           demo-vm = demoVm.config.system.build.vm;

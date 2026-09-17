@@ -1,9 +1,14 @@
 { pkgs, ... }:
 
+let
+  demoWeb = import ../../nix/demo-web.nix { inherit pkgs; };
+in
 {
+  # imports = [ ./monitoring.nix ];
+
   networking = {
     hostName = "demo";
-    firewall.allowedTCPPorts = [ 80 ];
+    firewall.allowedTCPPorts = [ 8000 ];
   };
 
   users.users.demo = {
@@ -19,14 +24,18 @@
     settings.PasswordAuthentication = true;
   };
 
-  services.nginx = {
-    enable = true;
-    virtualHosts.localhost.root = pkgs.writeTextDir "index.html" ''
-      <!doctype html>
-      <title>NixOS demo VM</title>
-      <h1>NixOS demo VM</h1>
-      <p>This web server, user account, SSH service, and firewall are declared in <code>/etc/nixos/demo.nix</code>.</p>
-    '';
+  systemd.services.demo-web = {
+    description = "Nix demo web application";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+
+    serviceConfig = {
+      ExecStart = "${demoWeb}/bin/demo-web";
+      DynamicUser = true;
+      StateDirectory = "demo-web";
+      WorkingDirectory = "/var/lib/demo-web";
+      Restart = "on-failure";
+    };
   };
 
   environment.systemPackages = with pkgs; [

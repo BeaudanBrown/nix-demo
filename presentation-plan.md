@@ -81,11 +81,11 @@ This maps well onto the kind of real research workflow where R is used for analy
 
 ## Main live demo command
 
-The simplest version of the demo should be:
+The simplest version of the research demo should be:
 
 ```bash
 cd nix-demo
-nix develop -c ./scripts/demo-check.sh
+nix develop .#research -c ./scripts/demo-check.sh
 ```
 
 Alternative, if the flake app is working well:
@@ -134,7 +134,7 @@ Key points:
 
 - `flake.nix` composes the environment from small declarative files;
 - `flake.lock` pins the exact upstream inputs;
-- `nix develop` enters the project environment;
+- `nix develop .#research` enters the research environment (plain `nix develop` now enters the web-demo environment);
 - tools do not need to be installed globally;
 - the project carries its environment recipe with it.
 
@@ -194,7 +194,7 @@ On local Linux machine:
 
 ```bash
 cd nix-demo
-nix develop -c ./scripts/demo-check.sh
+nix develop .#research -c ./scripts/demo-check.sh
 ```
 
 Narrative:
@@ -207,7 +207,7 @@ Switch to the Windows VM / WSL terminal and run the same thing:
 
 ```bash
 cd nix-demo
-nix develop -c ./scripts/demo-check.sh
+nix develop .#research -c ./scripts/demo-check.sh
 ```
 
 Narrative:
@@ -245,7 +245,7 @@ On the HPC, run the same core command if possible:
 
 ```bash
 cd nix-demo
-nix develop -c ./scripts/demo-check.sh
+nix develop .#research -c ./scripts/demo-check.sh
 ```
 
 If the HPC requires an interactive job first, the shape might be:
@@ -254,7 +254,7 @@ If the HPC requires an interactive job first, the shape might be:
 # example only; adapt to the actual scheduler
 salloc ...
 cd nix-demo
-nix develop -c ./scripts/demo-check.sh
+nix develop .#research -c ./scripts/demo-check.sh
 ```
 
 Narrative:
@@ -331,7 +331,7 @@ Run once on each:
 
 ```bash
 cd nix-demo
-nix develop -c ./scripts/demo-check.sh
+nix develop .#research -c ./scripts/demo-check.sh
 ```
 
 Save the output from each machine in case live network/cache access fails.

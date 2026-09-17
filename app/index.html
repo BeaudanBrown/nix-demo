@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yay Nix</title>
+  <link rel="icon" href="/nix-snowflake.svg" type="image/svg+xml">
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(ellipse at top, #293650, #11111b 75%);
+      color: #cdd6f4;
+      font-family: system-ui, sans-serif;
+    }
+    main { max-width: 1100px; margin: auto; padding: 36px 24px; text-align: center; }
+    h1 { margin: 0; color: #94e2d5; font-size: clamp(56px, 8vw, 100px); letter-spacing: -0.05em; }
+    .mode { display: inline-block; margin: 8px 0 0; padding: 6px 20px; border: 2px solid currentColor; border-radius: 999px; font: bold 24px ui-monospace, monospace; letter-spacing: 0.12em; }
+    .mode.DEV { color: #94e2d5; background: #94e2d512; }
+    .mode.PROD { color: #89b4fa; background: #89b4fa12; }
+    .logo { display: block; width: clamp(160px, 23vh, 260px); height: auto; margin: 12px auto 24px; }
+    .context { padding: 24px; border: 1px solid #45475a; border-radius: 20px; background: #181825; }
+    .label { color: #94e2d5; font-size: 16px; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 12px; }
+    .label.hostname { margin-top: 28px; }
+    code { font-family: ui-monospace, monospace; overflow-wrap: anywhere; }
+    .value { display: block; color: #fff; font-size: clamp(20px, 3vw, 32px); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Yay Nix</h1>
+    <p class="mode $mode" aria-label="Environment: $mode">$mode</p>
+    <!-- Nix logo: Simon Frankau and Tim Cuthbertson, CC BY 4.0.
+         https://github.com/NixOS/nixos-artwork/tree/master/logo
+         https://creativecommons.org/licenses/by/4.0/ -->
+    <img class="logo" src="/nix-snowflake.svg" alt="Nix snowflake logo" width="535" height="535">
+    <section class="context" aria-label="Runtime context">
+      <p class="label">Working directory</p>
+      <code class="value">$cwd</code>
+      <p class="label hostname">Hostname</p>
+      <code class="value">$hostname</code>
+    </section>
+  </main>
+</body>
+</html>
