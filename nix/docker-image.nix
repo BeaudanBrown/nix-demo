@@ -3,7 +3,11 @@ pkgs.dockerTools.buildLayeredImage {
   name = "nix-demo";
   tag = "latest";
 
-  contents = [ demoWeb ];
+  contents = [
+    demoWeb
+    pkgs.bashInteractive
+    pkgs.coreutils
+  ];
 
   extraCommands = ''
     mkdir -p tmp work

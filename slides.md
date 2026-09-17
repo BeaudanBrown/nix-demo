@@ -6,8 +6,8 @@
 
 <!--
 speaker_note: |
-  - High level of what Nix is and why I use it
-  - Shallow dive into the internals
+  - Software engineer by training biostatician by trade
+  - Side hustle vibe coding haskell web app for hospitality management
   - Better at answering questions than I am presenting
 -->
 
@@ -20,7 +20,8 @@ speaker_note: |
 speaker_note: |
   - Why → how it works → how to use it → real examples
   - Interrupt with questions
-  - Happy to slow down or follow an interesting tangent
+  - Interested or confused
+  - Ask if it can do things
   - Show things live where practical
 -->
 
@@ -33,21 +34,25 @@ speaker_note: |
 
 <!-- end_slide -->
 <!-- alignment: center -->
-<!-- jump_to_middle -->
 # What is software
 
 <!--
 speaker_note: |
-  - Left column
-    - Software isn’t just the executable—it includes everything needed to run it
-    - Scripts still depend on interpreters and external tools
-    - Applications depend on services; libraries introduce version compatibility problems
-  - Right column
-    - An environment is itself something we can build and share
-    - Reference your research pipeline: each stage consumes the previous stage’s outputs
-    - Nix can produce containers, not just compete with them
-    - Ansible/Puppet automate machine setup; NixOS applies Nix’s model to whole systems
-  - Same building blocks, different scales
+    Compiled binaries        browser, git, ffmpeg
+    Scripts                  bash, python
+    Full stack applications  multi-process, database, daemons
+    System libraries         glibc, openssl, cuda
+
+    Development environments  postgres, R, toolchain
+    Analysis pipelines        load → clean → process
+    Containers                docker, SIF
+    Linux systems             workstations, servers, VMs
+
+  - Name referenced: "python" is ambiguous even if we find it, docker is fallible
+  - Implicit dependencies: Can forget to declare, multi-language projects have multiple systems
+  - Mutable: Upgrading one project can affect another, plethora of tools trying to solve, often doesn't lock the language itself
+  - Transition
+    - What is nix
 -->
 
 | Software | | Also software | |
@@ -57,31 +62,16 @@ speaker_note: |
 | Full stack applications | <span style="color: #94e2d5">multi-process, database, daemons</span> | Containers | <span style="color: #94e2d5">docker, SIF</span> |
 | System libraries | <span style="color: #94e2d5">glibc, openssl, cuda</span> | Linux systems | <span style="color: #94e2d5">workstations, servers, VMs</span> |
 
-<!-- end_slide -->
+<!-- pause -->
 <!-- alignment: center -->
 <!-- jump_to_middle -->
 # How is software run
 
-<!--
-speaker_note: |
-  - Left column
-    - A name like `python` doesn’t identify a particular build
-    - Software may rely on tools or libraries you forgot were installed
-    - Your project stays unchanged, but an upgrade changes its surroundings
-  - Right column
-    - Pinning records more precise dependency choices
-    - Manifests and build recipes make requirements explicit
-    - Isolation reduces interference between projects—not all change
-    - These approaches complement each other; we often combine them
-  - Transition
-    - Nix brings these ideas together around explicit build inputs and dependencies
--->
-
 | How software runs | | How we manage it | |
 |---|---|---|---|
-| Name referenced | <span style="color: #f38ba8">executable names, library names</span> | Pin dependencies | <span style="color: #94e2d5">lockfiles, image digests</span> |
-| Implicit dependencies | <span style="color: #f38ba8">assumes tools and libraries exist</span> | Declare dependencies | <span style="color: #94e2d5">manifests, build recipes</span> |
-| Mutable | <span style="color: #f38ba8">upgrades, installs, removals</span> | Isolate environments | <span style="color: #94e2d5">venv, Conda, Docker</span> |
+| Name referenced | <span style="color: #f38ba8">executable names, library names</span> | FHS assumptions | <span style="color: #94e2d5">/lib, /bin, PATH</span> |
+| Implicit dependencies | <span style="color: #f38ba8">assumes tools and libraries exist</span> | Declare dependencies | <span style="color: #94e2d5">lockfiles, image digests</span> |
+| Mutable | <span style="color: #f38ba8">upgrades, installs, removals</span> | Isolate environments | <span style="color: #94e2d5">venv, Docker, rustup</span> |
 
 <!-- end_slide -->
 <!-- alignment: center -->
@@ -188,23 +178,41 @@ Think compiler bootstrapping, Nix assembly
 
 # In practice
 ## Nixpkgs
-![image:width:100%](images/nixpkgs.png)
 - \>140,000 packages
 - \>1,000,000 commits
-- \>15,000 contributors
+- \>10,000 contributors
 - Cross platform
 - Cross architecture
+
+<!-- pause -->
+
+<!-- jump_to_middle -->
+
+## Binary caches
+
+| Part | Purpose |
+|---|---|
+| Cache | <span style="color: #94e2d5">Downloads signed store paths from remote storage</span> |
+| `cache.nixos.org` | <span style="color: #94e2d5">&gt;700 TiB; around 6 billion requests each month</span> |
+| Hydra | <span style="color: #94e2d5">Builds Nixpkgs continuously and publishes outputs</span> |
+| Your cache | <span style="color: #94e2d5">Publish private packages and CI build outputs</span> |
+
+<!--
+speaker_note: |
+  - Hydra is NixOS's continuous-build system; cache.nixos.org serves its outputs
+  - A cache is not a remote filesystem mount: clients fetch signed Nix store paths
+  - The public cache avoids rebuilding most common dependencies locally
+  - Organisations can run their own binary cache for private packages and CI outputs
+-->
 <!-- end_slide -->
 <!-- alignment: center -->
 # nix run
-## Run it. Don't install it.
+## Just give it to me
 
 <!--
 speaker_note: |
   - Run a program without adding it to your normal PATH or global profile
-  - Resolve: evaluate the package definition to identify the expected output and dependencies
-  - Store, cache, and build are fallbacks—not three operations performed every time
-  - A local hit skips downloading and building
+  - Evaluate: dependency closure
   - Dependencies follow the same process; building an app need not mean building its compiler
   - Downloads and build outputs remain in /nix/store for reuse
   - nix run uses the host environment; it is not a container or runtime sandbox
@@ -215,23 +223,56 @@ speaker_note: |
 
 | Step | What Nix does |
 |---|---|
-| Resolve | <span style="color: #94e2d5">What store paths are required</span> |
+| Evaluate | <span style="color: #94e2d5">What store paths are required</span> |
 | Check the store | <span style="color: #94e2d5">Do we already have them</span> |
 | Check binary caches | <span style="color: #94e2d5">Does anyone else have them</span> |
 | Build if needed | <span style="color: #94e2d5">Fine we'll do it</span> |
 | Run | <span style="color: #94e2d5">Send it</span> |
 
+<!-- pause -->
 ```bash +exec
 command -v cowsay || echo "Not on PATH"
 /// printf '\n────────────────────────────────────────\n\n'
-nix run nixpkgs#cowsay -- "Hello from Grill"
+nix run nixpkgs#cowsay -- "Wow Nix is lit"
 /// printf '\n────────────────────────────────────────\n\n'
 command -v cowsay || echo "Still not on PATH"
 ```
 <!-- end_slide -->
 <!-- alignment: center -->
+# nix build
+## Generate the store contents
+
+<!--
+speaker_note: |
+  - Source: changes → new hash → new store path; versions coexist in parallel
+  - Build instructions: Python doesn't need compiling, but still needs packaging
+  - Dependencies: sandboxed builds can only see declared inputs; version changes change the hash
+  - Output: output/demo-web store store; all dependencies also created
+  - Next: explore a declared development environment for this project
+-->
+
+| Ingredient | What Nix does |
+|---|---|
+| Source | <span style="color: #94e2d5">Takes a snapshot of the application</span> |
+| Build instructions | <span style="color: #94e2d5">Produces the package and its launcher</span> |
+| Dependencies | <span style="color: #94e2d5">Connects the launcher to the required Python</span> |
+| Output | <span style="color: #94e2d5">Stores the result immutably in /nix/store</span> |
+
+<!-- jump_to_middle -->
+<!-- pause -->
+
+```bash +exec +acquire_terminal
+# Build and run the packaged application
+/// printf '\033[>4;0m\033[>0u\033[3J\033[2J\033[H' >/dev/tty
+/// printf 'nix build .#demo-web --out-link output/demo-web\n./output/demo-web/bin/demo-web\n\nhttp://grill:8000\n\n'
+/// printf '\033[?25h' >/dev/tty
+/// "${SHELL:-bash}" -i </dev/tty >/dev/tty 2>&1 || true
+/// printf '\033[<u\033[?25l' >/dev/tty
+```
+<!-- end_slide -->
+<!-- alignment: center -->
 # nix develop
-## A project's tools, without the setup instructions
+## Everything required to build, plus more
 
 <!--
 speaker_note: |
@@ -250,7 +291,7 @@ speaker_note: |
   - Open http://grill:8000 on T480; the application is running from source on Grill
   - This is not a container: host files and inherited environment remain accessible
   - Ctrl+C stops the server; exit leaves nix develop; exit again returns to slides
-  - Transition: Now we can work on the application. Let's turn it into something we can ship.
+  - Transition: reuse the packaged application in a container next.
 -->
 
 | Ingredients | Examples |
@@ -261,42 +302,12 @@ speaker_note: |
 | Environment setup | <span style="color: #94e2d5">Variables and startup hooks</span> |
 
 <!-- jump_to_middle -->
+<!-- pause -->
 
 ```bash +exec +acquire_terminal
 # Inspect Python, then enter the project environment
 /// printf '\033[>4;0m\033[>0u\033[3J\033[2J\033[H' >/dev/tty
 /// printf 'python --version\nnix develop\npython --version\npython app/server.py\n\nhttp://grill:8000\n\n'
-/// printf '\033[?25h' >/dev/tty
-/// "${SHELL:-bash}" -i </dev/tty >/dev/tty 2>&1 || true
-/// printf '\033[<u\033[?25l' >/dev/tty
-```
-<!-- end_slide -->
-<!-- alignment: center -->
-# nix build
-## From source code to a runnable package
-
-<!--
-speaker_note: |
-  - Source: changes → new hash → new store path; versions coexist in parallel
-  - Build instructions: Python doesn't need compiling, but still needs packaging
-  - Dependencies: sandboxed builds can only see declared inputs; version changes change the hash
-  - Output: output/demo-web points to the immutable store output
-  - Next: put this exact package into a container
--->
-
-| Ingredient | What Nix does |
-|---|---|
-| Source | <span style="color: #94e2d5">Takes a snapshot of the application</span> |
-| Build instructions | <span style="color: #94e2d5">Produces the package and its launcher</span> |
-| Dependencies | <span style="color: #94e2d5">Connects the launcher to the required Python</span> |
-| Output | <span style="color: #94e2d5">Stores the result immutably in /nix/store</span> |
-
-<!-- jump_to_middle -->
-
-```bash +exec +acquire_terminal
-# Build and run the packaged application
-/// printf '\033[>4;0m\033[>0u\033[3J\033[2J\033[H' >/dev/tty
-/// printf 'nix build .#demo-web --out-link output/demo-web\n./output/demo-web/bin/demo-web\n\nhttp://grill:8000\n\n'
 /// printf '\033[?25h' >/dev/tty
 /// "${SHELL:-bash}" -i </dev/tty >/dev/tty 2>&1 || true
 /// printf '\033[<u\033[?25l' >/dev/tty
@@ -328,6 +339,7 @@ speaker_note: |
 | Runtime dependencies | <span style="color: #94e2d5">Everything it needs to run—not the development tools</span> |
 | Image configuration | <span style="color: #94e2d5">Startup command and working directory</span> |
 | Docker | <span style="color: #94e2d5">Provides runtime isolation and networking</span> |
+<!-- pause -->
 
 <!-- jump_to_middle -->
 <!-- column_layout: [1, 1] -->
@@ -335,7 +347,7 @@ speaker_note: |
 ### Describe the image
 
 ```bash +exec +acquire_terminal
-# Image definition
+# No Dockerfile
 /// nvim nix/docker-image.nix
 ```
 
@@ -346,7 +358,9 @@ speaker_note: |
 ```bash +exec +acquire_terminal
 # Build, load and run the container
 /// printf '\033[>4;0m\033[>0u\033[3J\033[2J\033[H' >/dev/tty
-/// printf 'nix build .#dockerImage --out-link output/demo-image\ndocker load < output/demo-image && docker run --rm -it -p 8001:8000 nix-demo:latest\n\nhttp://grill:8001\n\n'
+/// printf 'nix build .#dockerImage --out-link output/demo-image\ndocker load < output/demo-image && docker run --rm -it -p 8001:8000 nix-demo:latest\n'
+/// printf 'docker run --rm -it --entrypoint /bin/bash nix-demo:latest\n\nhttp://grill:8001\n\n'
+
 /// printf '\033[?25h' >/dev/tty
 /// "${SHELL:-bash}" -i </dev/tty >/dev/tty 2>&1 || true
 /// printf '\033[<u\033[?25l' >/dev/tty
@@ -395,20 +409,88 @@ speaker_note: |
 <!-- end_slide -->
 <!-- alignment: center -->
 # Nix everything
-## Real world example
+## Same tool for any scale
+
+| Scale | Examples |
+|---|---|
+| One project | <span style="color: #94e2d5">Dependencies, tools, builds</span> |
+| One user | <span style="color: #94e2d5">Shell, editor, desktop configuration</span> |
+| One machine | <span style="color: #94e2d5">Services, users, networking, storage</span> |
+| Many machines | <span style="color: #94e2d5">Shared modules and host-specific configurations</span> |
+
+<!--
+speaker_note: |
+  - One project: the same package definitions feed development environments and builds
+  - One user: Home Manager commonly handles user-level configuration
+  - One machine: NixOS composes services and system settings into a machine configuration
+  - Many machines: reuse modules across hosts; deployment still needs a separate step or tool
+  - Demo: hosted-services is one example of reusing a declaration across infrastructure components
+-->
+
+<!-- jump_to_middle -->
+
 ```bash +exec +acquire_terminal
-# Complex packages
-/// nvim nix/moonlight.nix
-```
-<!-- pause -->
-<!-- new_lines: 2 -->
-## Infrastructure
-```bash +exec +acquire_terminal
-# Anything as code
+# Example from my machines
 /// nvim '+/nginxVhosts' vendored/nix-dotfiles/modules/hosted-services/server.nix
 /// nvim '+/hostedServices' vendored/nix-dotfiles/modules/services/attic/nas.nix
 ```
 <!-- end_slide -->
-<!-- jump_to_middle -->
 <!-- alignment: center -->
-# Let's see it!
+# Caveats
+
+<!-- jump_to_middle -->
+
+## What's the catch?
+
+| Challenge | Reality |
+|---|---|
+| Learning curve | <span style="color: #94e2d5">New language, concepts, and debugging techniques</span> |
+| Ecosystem | <span style="color: #94e2d5">Documentation and conventions can be fragmented</span> |
+| Compatibility | <span style="color: #94e2d5">Software often assumes a conventional Linux filesystem</span> |
+| Resources | <span style="color: #94e2d5">Builds, caches, and old generations consume time and disk</span> |
+| Boundaries | <span style="color: #94e2d5">Reproducible configuration doesn't make mutable data reproducible</span> |
+
+<!--
+speaker_note: |
+  Learning curve:
+  - Cryptic errors
+  Ecosystem:
+  - Fragmented documentation; awkward partial adoption
+  - Nixpkgs pins whole package sets; mixing versions gets messy
+  Compatibility:
+  - FHS-assuming upstream builds need ugly patches
+  Resources:
+  - glibc changes trigger huge rebuilds; replacement hacks aren't always ABI-safe
+  - Slow large evaluations; builds and generations eat disk
+  Boundaries:
+  - Cache signatures prove origin, not build correctness
+  - System rollback doesn't undo database migrations
+-->
+<!-- end_slide -->
+<!-- alignment: center -->
+# The story of Nix
+
+<!-- jump_to_middle -->
+
+| We covered | Key idea |
+|---|---|
+| The problem | <span style="color: #94e2d5">Software setup is fragile and hard to repeat</span> |
+| How Nix works | <span style="color: #94e2d5">Builds are defined by declared, hashed inputs</span> |
+| How to use it | <span style="color: #94e2d5">Run tools, enter environments, build packages</span> |
+| Where it scales | <span style="color: #94e2d5">Containers, NixOS, users, machines, infrastructure</span> |
+| The trade-offs | <span style="color: #94e2d5">Learning curve, compatibility, resources, trust</span> |
+
+<!-- new_lines: 2 -->
+
+**Reproducible software—from one command to whole systems.**
+
+<!--
+speaker_note: |
+  - We started with the setup and reproducibility problems
+  - Nix makes dependencies, source, and build instructions explicit inputs
+  - We used run, develop, and build on one application
+  - We reused its package in a container and declared a complete NixOS VM
+  - The caveats are real: use Nix where repeatability is worth the complexity
+  - Questions?
+-->
+
